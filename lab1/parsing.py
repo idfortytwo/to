@@ -1,19 +1,22 @@
+import requests
+
 from decimal import Decimal
 from xml.etree import ElementTree
 
-import requests
-
 from lab1.utils import SingletonMetaclass
-from lab1.data import Currency
 
 
 class XMLProvider(metaclass=SingletonMetaclass):
     def __init__(self, url):
         self._response = requests.get(url)
+        self._xml = ElementTree.fromstring(self._response.content)
 
-    def get_xml(self):
-        xml = ElementTree.fromstring(self._response.content)
-        yield from xml
+    @property
+    def xml(self):
+        return self._xml
+
+    def get_xml_gen(self):
+        yield from self._xml
 
 
 class NBPParser:
@@ -32,4 +35,4 @@ class NBPParser:
             avg_exchange_rate = Decimal(avg_exchange_rate_str.replace(',', '.'))
             conversion_factor = int(element.find('przelicznik').text)
 
-            yield Currency(code, title, avg_exchange_rate, conversion_factor)
+            yield code, title, avg_exchange_rate, conversion_factor

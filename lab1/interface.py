@@ -4,14 +4,19 @@ from decimal import Decimal
 
 from lab1.data import Currencies, Currency
 from lab1.parsing import XMLProvider, NBPParser
-from lab1.utils import SingletonMetaclass
 
 
-class CurrencyCalculator(metaclass=SingletonMetaclass):
+class CurrencyCalculator:
     def __init__(self, url):
         provider = XMLProvider(url)
-        parser = NBPParser(provider.get_xml())
-        self._currencies_dict = Currencies(parser.parse()).currencies_dict
+        parser = NBPParser(provider.get_xml_gen())
+
+        currencies_gen = (
+            Currency(code, title, avg_exchange_rate, conversion_factor)
+            for code, title, avg_exchange_rate, conversion_factor
+            in parser.parse()
+        )
+        self._currencies_dict = Currencies(currencies_gen).currencies_dict
 
         self._format = '{} | {:35} | {:11} | {}'
 
@@ -67,7 +72,7 @@ class CurrencyCalculator(metaclass=SingletonMetaclass):
     @staticmethod
     def _convert(currency_from: Currency, currency_to: Currency, amount: int) -> int:
         return (currency_from.avg_exchange_rate / currency_from.conversion_factor) \
-            / (currency_to.avg_exchange_rate / currency_to.conversion_factor) * amount
+               / (currency_to.avg_exchange_rate / currency_to.conversion_factor) * amount
 
     def _input_loop(self):
         amount = self._get_amount_from_input()

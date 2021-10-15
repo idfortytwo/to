@@ -1,6 +1,3 @@
-from lab1.utils import SingletonMetaclass
-
-
 class Currency:
     def __init__(self, code, title, avg_exchange_rate, conversion_factor):
         self._code = code
@@ -28,7 +25,7 @@ class Currency:
         return f'Currency({self.code}, {self.title}, {self.avg_exchange_rate}, {self.conversion_factor})'
 
 
-class Currencies(metaclass=SingletonMetaclass):
+class Currencies:
     def __init__(self, currencies):
         self._currencies = {
             currency.code: currency
