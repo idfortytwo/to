@@ -49,11 +49,11 @@ class CurrencyCalculator:
 
         return amount
 
-    def _get_currency_from_input(self) -> Currency:
+    def _get_currency_from_input(self, input_prompt) -> Currency:
         currency = None
 
         while not currency:
-            code = input('Przelicz z (kod waluty): ').strip().upper()
+            code = input(input_prompt).strip().upper()
 
             if not self._check_currency_code_format(code):
                 print('Nieprawidłowy kod waluty')
@@ -74,10 +74,15 @@ class CurrencyCalculator:
         return (currency_from.avg_exchange_rate / currency_from.conversion_factor) \
                / (currency_to.avg_exchange_rate / currency_to.conversion_factor) * amount
 
+    @staticmethod
+    def _ask_exit() -> bool:
+        answer = input('Kontynuować? Y/N ')
+        return answer.upper() == 'N'
+
     def _input_loop(self):
         amount = self._get_amount_from_input()
-        currency_from = self._get_currency_from_input()
-        currency_to = self._get_currency_from_input()
+        currency_from = self._get_currency_from_input('Przelicz z (kod waluty): ')
+        currency_to = self._get_currency_from_input('Przelicz na (kod waluty): ')
         final_amount = self._convert(currency_from, currency_to, amount)
 
         print(f'{currency_from.code} {amount} -> {currency_to.code} {final_amount:.5f}')
@@ -86,3 +91,5 @@ class CurrencyCalculator:
         self._show_currencies()
         while True:
             self._input_loop()
+            if self._ask_exit():
+                break
