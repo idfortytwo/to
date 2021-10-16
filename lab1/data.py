@@ -27,12 +27,16 @@ class Currency:
 
 class Currencies:
     def __init__(self, currencies):
-        self._currencies = {
-            currency.code: currency
-            for currency
-            in currencies
-        }
+        self._currencies = currencies
+
+    @property
+    def currencies(self):
+        return self._currencies
 
     @property
     def currencies_dict(self):
-        return self._currencies
+        return {
+            currency.code: currency
+            for currency
+            in self._currencies
+        }
