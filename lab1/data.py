@@ -36,8 +36,7 @@ class Currencies:
     def currencies(self) -> [Currency]:
         return self._currencies
 
-    @property
-    def currencies_dict(self) -> {str: Currency}:
+    def get_currencies_dict(self) -> {str: Currency}:
         return {
             currency.code: currency
             for currency
