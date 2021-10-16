@@ -1,9 +1,9 @@
-from lab1.interface import CurrencyCalculator
+from lab1.interface import UserInterface
 
 
 def main():
-    calc = CurrencyCalculator('https://www.nbp.pl/kursy/xml/lasta.xml')
-    calc.run()
+    app = UserInterface()
+    app.run()
 
 
 if __name__ == '__main__':

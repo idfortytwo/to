@@ -1,23 +1,15 @@
 import decimal
 import re
+
 from decimal import Decimal
 
-from lab1.data import Currencies, Currency
-from lab1.parsing import XMLProvider, NBPParser
+from lab1.calculator import CurrencyCalculator
+from lab1.data import Currency
 
 
-class CurrencyCalculator:
-    def __init__(self, url: str):
-        provider = XMLProvider(url)
-        parser = NBPParser(provider.get_xml_gen())
-
-        currencies_gen = (
-            Currency(code, name, avg_exchange_rate, conversion_factor)
-            for code, name, avg_exchange_rate, conversion_factor
-            in parser.parse()
-        )
-        self._currencies_dict: {str: Currency} = Currencies(currencies_gen).currencies_dict
-
+class UserInterface:
+    def __init__(self):
+        self._calculator = CurrencyCalculator()
         self._format = '{} | {:35} | {:11} | {}'
 
     def _print_header(self):
@@ -30,11 +22,11 @@ class CurrencyCalculator:
 
     def _print_currencies(self):
         self._print_header()
-        for currency in self._currencies_dict.values():
+        for currency in self._calculator.currencies:
             self._print_currency(currency)
 
     @staticmethod
-    def _get_amount_from_input() -> int:
+    def _get_amount_from_input() -> Decimal:
         amount = None
 
         while not amount:
@@ -59,7 +51,7 @@ class CurrencyCalculator:
                 print('Nieprawidłowy kod waluty')
                 continue
 
-            currency = self._currencies_dict.get(code, None)
+            currency = self._calculator.currencies_dict.get(code, None)
             if not currency:
                 print('Nie znaleziono takiej waluty')
 
@@ -70,11 +62,6 @@ class CurrencyCalculator:
         return re.match('^[A-Z]{3}$', code)
 
     @staticmethod
-    def _convert(currency_from: Currency, currency_to: Currency, amount: int) -> Decimal:
-        return (currency_from.avg_exchange_rate / currency_from.conversion_factor) \
-               / (currency_to.avg_exchange_rate / currency_to.conversion_factor) * amount
-
-    @staticmethod
     def _ask_exit() -> bool:
         answer = input('Kontynuować? Y/N ')
         return answer.upper() == 'N'
@@ -83,7 +70,7 @@ class CurrencyCalculator:
         amount = self._get_amount_from_input()
         currency_from = self._get_currency_from_input('Przelicz z (kod waluty): ')
         currency_to = self._get_currency_from_input('Przelicz na (kod waluty): ')
-        final_amount = self._convert(currency_from, currency_to, amount)
+        final_amount = self._calculator.convert(currency_from, currency_to, amount)
 
         print(f'{currency_from.code} {amount} -> {currency_to.code} {final_amount:.5f}')
 
