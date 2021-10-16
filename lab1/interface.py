@@ -28,7 +28,7 @@ class CurrencyCalculator:
         print(self._format.format(
             currency.code, currency.title, currency.avg_exchange_rate, currency.conversion_factor))
 
-    def _show_currencies(self):
+    def _print_currencies(self):
         self._print_header()
         for currency in self._currencies_dict.values():
             self._print_currency(currency)
@@ -88,7 +88,7 @@ class CurrencyCalculator:
         print(f'{currency_from.code} {amount} -> {currency_to.code} {final_amount:.5f}')
 
     def run(self):
-        self._show_currencies()
+        self._print_currencies()
         while True:
             self._input_loop()
             if self._ask_exit():
