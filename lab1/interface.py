@@ -7,7 +7,7 @@ from lab1.parsing import XMLProvider, NBPParser
 
 
 class CurrencyCalculator:
-    def __init__(self, url):
+    def __init__(self, url: str):
         provider = XMLProvider(url)
         parser = NBPParser(provider.get_xml_gen())
 
@@ -16,7 +16,7 @@ class CurrencyCalculator:
             for code, title, avg_exchange_rate, conversion_factor
             in parser.parse()
         )
-        self._currencies_dict = Currencies(currencies_gen).currencies_dict
+        self._currencies_dict: {str: Currency} = Currencies(currencies_gen).currencies_dict
 
         self._format = '{} | {:35} | {:11} | {}'
 
@@ -49,7 +49,7 @@ class CurrencyCalculator:
 
         return amount
 
-    def _get_currency_from_input(self, input_prompt) -> Currency:
+    def _get_currency_from_input(self, input_prompt: str) -> Currency:
         currency = None
 
         while not currency:
@@ -70,7 +70,7 @@ class CurrencyCalculator:
         return re.match('^[A-Z]{3}$', code)
 
     @staticmethod
-    def _convert(currency_from: Currency, currency_to: Currency, amount: int) -> int:
+    def _convert(currency_from: Currency, currency_to: Currency, amount: int) -> Decimal:
         return (currency_from.avg_exchange_rate / currency_from.conversion_factor) \
                / (currency_to.avg_exchange_rate / currency_to.conversion_factor) * amount
 

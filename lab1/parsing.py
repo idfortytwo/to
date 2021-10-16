@@ -1,5 +1,6 @@
 import requests
 
+from typing import Generator, Tuple
 from decimal import Decimal
 from xml.etree import ElementTree
 
@@ -7,15 +8,15 @@ from lab1.utils import SingletonMetaclass
 
 
 class XMLProvider(metaclass=SingletonMetaclass):
-    def __init__(self, url):
-        self._response = requests.get(url)
-        self._xml = ElementTree.fromstring(self._response.content)
+    def __init__(self, url: str):
+        response = requests.get(url)
+        self._xml: ElementTree.Element = ElementTree.fromstring(response.content)
 
     @property
-    def xml(self):
+    def xml(self) -> ElementTree.Element:
         return self._xml
 
-    def get_xml_gen(self):
+    def get_xml_gen(self) -> Generator[ElementTree.Element, None, None]:
         yield from self._xml
 
 
@@ -23,7 +24,7 @@ class NBPParser:
     def __init__(self, data_source):
         self._data_source = data_source
 
-    def parse(self):
+    def parse(self) -> Generator[Tuple[str, str, Decimal, int], None, None]:
         data_it = iter(self._data_source)
         next(data_it)
         next(data_it)
