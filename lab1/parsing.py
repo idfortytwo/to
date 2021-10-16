@@ -31,9 +31,9 @@ class NBPParser:
 
         for element in data_it:
             code = element.find('kod_waluty').text
-            title = element.find('nazwa_waluty').text
+            name = element.find('nazwa_waluty').text
             avg_exchange_rate_str = element.find('kurs_sredni').text
             avg_exchange_rate = Decimal(avg_exchange_rate_str.replace(',', '.'))
             conversion_factor = int(element.find('przelicznik').text)
 
-            yield code, title, avg_exchange_rate, conversion_factor
+            yield code, name, avg_exchange_rate, conversion_factor

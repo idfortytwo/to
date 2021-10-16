@@ -2,9 +2,9 @@ from decimal import Decimal
 
 
 class Currency:
-    def __init__(self, code: str, title: str, avg_exchange_rate: Decimal, conversion_factor: int):
+    def __init__(self, code: str, name: str, avg_exchange_rate: Decimal, conversion_factor: int):
         self._code: str = code
-        self._title: str = title
+        self._name: str = name
         self._avg_exchange_rate: Decimal = avg_exchange_rate
         self._conversion_factor: int = conversion_factor
 
@@ -13,8 +13,8 @@ class Currency:
         return self._code
 
     @property
-    def title(self) -> str:
-        return self._title
+    def name(self) -> str:
+        return self._name
 
     @property
     def avg_exchange_rate(self) -> Decimal:
@@ -25,7 +25,7 @@ class Currency:
         return self._conversion_factor
 
     def __repr__(self) -> str:
-        return f'Currency({self.code}, {self.title}, {self.avg_exchange_rate}, {self.conversion_factor})'
+        return f'Currency({self.code}, {self.name}, {self.avg_exchange_rate}, {self.conversion_factor})'
 
 
 class Currencies:

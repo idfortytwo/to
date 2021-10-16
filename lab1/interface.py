@@ -12,8 +12,8 @@ class CurrencyCalculator:
         parser = NBPParser(provider.get_xml_gen())
 
         currencies_gen = (
-            Currency(code, title, avg_exchange_rate, conversion_factor)
-            for code, title, avg_exchange_rate, conversion_factor
+            Currency(code, name, avg_exchange_rate, conversion_factor)
+            for code, name, avg_exchange_rate, conversion_factor
             in parser.parse()
         )
         self._currencies_dict: {str: Currency} = Currencies(currencies_gen).currencies_dict
@@ -26,7 +26,7 @@ class CurrencyCalculator:
 
     def _print_currency(self, currency: Currency):
         print(self._format.format(
-            currency.code, currency.title, currency.avg_exchange_rate, currency.conversion_factor))
+            currency.code, currency.name, currency.avg_exchange_rate, currency.conversion_factor))
 
     def _print_currencies(self):
         self._print_header()
