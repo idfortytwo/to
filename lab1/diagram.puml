@@ -1,5 +1,4 @@
 @startuml
-'https://plantuml.com/class-diagram
 
 class Decimal
 Decimal <-[dashed]- CurrencyCalculator
@@ -56,9 +55,5 @@ class UserInterface {
     + run(): void
 }
 UserInterface -[dashed]-> CurrencyCalculator
-
-
-
-
 
 @enduml
