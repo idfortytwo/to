@@ -1,0 +1,64 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class Decimal
+Decimal <-[dashed]- CurrencyCalculator
+Decimal <-[dashed]- Currency
+Decimal <-u[dashed]- NBPParser
+
+class xml
+xml <-d[dashed]- XMLProvider
+
+class Currency {
+    + <<r/o>> code: str
+    + <<r/o>> name: str
+    + <<r/o>> avg_exchange_rate: Decimal
+    + <<r/o>> conversion_factor: int
+}
+
+class Currencies {
+    + <<r/o>> currencies: [Currency]
+    + get_currencies_dict(): {str: Currency}}
+}
+Currencies *-- "n" Currency
+
+
+class SingletonMetaclass {
+    - _instances: {Class: object}
+    # __call__(Class, ...): object
+}
+SingletonMetaclass -d-|> type
+
+class NBPParser {
+    - _data_source: Iterable
+    + parse(): Generator[Tuple[str, str, Decimal, int]]
+}
+
+class XMLProvider {
+    + <<r/o>> xml: xml.ElementTree
+    + get_xml_gen(): Generator[ElementTree.Element]
+}
+XMLProvider -[dashed]-> "<<instantiates>>" SingletonMetaclass
+XMLProvider --> NBPParser
+
+class CurrencyCalculator {
+    + <<r/o>> currencies: [Currency]
+    + <<r/o>> currencies_dict: {str: Currency}
+    + {static} convert(Currency, Currency, Decimal)
+}
+CurrencyCalculator -[dashed]-> XMLProvider
+CurrencyCalculator -[dashed]--> NBPParser
+CurrencyCalculator -[dashed]--> Currencies
+CurrencyCalculator -l[dashed]-> Currency
+
+class UserInterface {
+    - _calculator: CurrencyCalculator
+    + run(): void
+}
+UserInterface -[dashed]-> CurrencyCalculator
+
+
+
+
+
+@enduml
