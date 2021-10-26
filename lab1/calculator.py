@@ -9,11 +9,14 @@ class CurrencyCalculator:
         provider = XMLProvider('https://www.nbp.pl/kursy/xml/lasta.xml')
         parser = NBPParser(provider.get_xml_gen())
 
-        self._currencies = Currencies([
+        currencies_list = [
             Currency(code, name, avg_exchange_rate, conversion_factor)
             for code, name, avg_exchange_rate, conversion_factor
             in parser.parse()
-        ])
+        ]
+        currencies_list.append(Currency('PLN', 'złoty', Decimal(1), 1))
+
+        self._currencies = Currencies(currencies_list)
         self._currencies_dict: {str: Currency} = self._currencies.get_currencies_dict()
 
     @property
