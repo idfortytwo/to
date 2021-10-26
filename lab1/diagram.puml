@@ -4,6 +4,7 @@ class Decimal
 Decimal <-[dashed]- CurrencyCalculator
 Decimal <-[dashed]- Currency
 Decimal <-u[dashed]- NBPParser
+Decimal <-l[dashed]- UserInterface
 
 class xml
 xml <-d[dashed]- XMLProvider
@@ -19,7 +20,7 @@ class Currencies {
     + currencies: [Currency] <<get>>
     + get_currencies_dict(): {str: Currency}}
 }
-Currencies *-- "n" Currency
+Currencies "1" *-- "n" Currency
 
 
 class SingletonMetaclass {
@@ -45,15 +46,25 @@ class CurrencyCalculator {
     + currencies_dict: {str: Currency} <<get>>
     + {static} convert(Currency, Currency, Decimal)
 }
-CurrencyCalculator -[dashed]-> XMLProvider
-CurrencyCalculator -[dashed]--> NBPParser
-CurrencyCalculator -[dashed]--> Currencies
-CurrencyCalculator -l[dashed]-> Currency
+CurrencyCalculator "1" --o "1" XMLProvider
+CurrencyCalculator "1" --o "1" NBPParser
+CurrencyCalculator "1" ---* "1" Currencies
+CurrencyCalculator -l-> Currency
 
 class UserInterface {
     - _calculator: CurrencyCalculator
+    - _format: str
+    - _print_header(): void
+    - _print_currency(): void
+    - _print_currencies(): void
+    - {static} _get_amount_from_input(): Decimal
+    - _get_currency_from_input(str): Currency
+    - {static} _check_currency_code_format(str): re.Match
+    - {static} _ask_exit(): bool
+    - _input_loop(): void
     + run(): void
 }
-UserInterface -[dashed]-> CurrencyCalculator
+UserInterface "1" --o "1" CurrencyCalculator
+UserInterface -[dashed]--> Currency
 
 @enduml
