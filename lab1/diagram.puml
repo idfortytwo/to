@@ -9,14 +9,14 @@ class xml
 xml <-d[dashed]- XMLProvider
 
 class Currency {
-    + <<r/o>> code: str
-    + <<r/o>> name: str
-    + <<r/o>> avg_exchange_rate: Decimal
-    + <<r/o>> conversion_factor: int
+    + code: str <<get>>
+    + name: str <<get>>
+    + avg_exchange_rate: Decimal <<get>>
+    + conversion_factor: int <<get>>
 }
 
 class Currencies {
-    + <<r/o>> currencies: [Currency]
+    + currencies: [Currency] <<get>>
     + get_currencies_dict(): {str: Currency}}
 }
 Currencies *-- "n" Currency
@@ -24,7 +24,7 @@ Currencies *-- "n" Currency
 
 class SingletonMetaclass {
     - _instances: {Class: object}
-    # __call__(Class, ...): object
+    + __call__(Class, ...): object
 }
 SingletonMetaclass -d-|> type
 
@@ -34,15 +34,15 @@ class NBPParser {
 }
 
 class XMLProvider {
-    + <<r/o>> xml: xml.ElementTree
+    + xml: xml.ElementTree <<get>>
     + get_xml_gen(): Generator[ElementTree.Element]
 }
 XMLProvider -[dashed]-> "<<instantiates>>" SingletonMetaclass
 XMLProvider --> NBPParser
 
 class CurrencyCalculator {
-    + <<r/o>> currencies: [Currency]
-    + <<r/o>> currencies_dict: {str: Currency}
+    + currencies: [Currency] <<get>>
+    + currencies_dict: {str: Currency} <<get>>
     + {static} convert(Currency, Currency, Decimal)
 }
 CurrencyCalculator -[dashed]-> XMLProvider
