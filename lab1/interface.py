@@ -23,7 +23,8 @@ class UserInterface:
     def _print_currencies(self):
         self._print_header()
         for currency in self._calculator.currencies:
-            self._print_currency(currency)
+            if currency.code != 'PLN':
+                self._print_currency(currency)
 
     @staticmethod
     def _get_amount_from_input() -> Decimal:
