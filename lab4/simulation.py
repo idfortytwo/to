@@ -2,7 +2,6 @@ import itertools
 import math
 import random
 from collections import UserDict, defaultdict
-
 from typing import Tuple, DefaultDict
 
 from lab4.states import Person, VulnerableState, SympthomaticState, AsympthomaticState
@@ -135,15 +134,14 @@ class Simulation:
     def _check_contacts(self):
         pairs_to_delete = []
 
-        for (_, prev_duration), ((curr_p1, curr_p2), curr_duration) \
+        for (_, prev_duration), ((p1, p2), curr_duration) \
                 in zip(self._prev_contacts.items(), self._curr_contacts.items()):
-            curr_duration: int
-            if curr_duration >= 3:
-                curr_p1.contact(curr_p2)
-                curr_p2.contact(curr_p1)
-                pairs_to_delete.append((curr_p1, curr_p2))
+            if curr_duration >= 3:  # noqa
+                p1.contact(p2)
+                p2.contact(p1)
+                pairs_to_delete.append((p1, p2))
             elif prev_duration == curr_duration:
-                pairs_to_delete.append((curr_p1, curr_p2))
+                pairs_to_delete.append((p1, p2))
 
         for pair in pairs_to_delete:
             del self._curr_contacts[pair]
