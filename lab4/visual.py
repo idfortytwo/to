@@ -44,8 +44,10 @@ class GUI(QWidget):
     def initUI(self):
         self._pop_count_label = QLabel(self)
         self._sick_count_label = QLabel(self)
+        self._sick_count_label.setStyleSheet('QLabel { color: rgb(255, 64, 0) }')
         self._vulnerable_count_label = QLabel(self)
         self._immune_count_label = QLabel(self)
+        self._immune_count_label.setStyleSheet('QLabel { color: rgb(0, 204, 102) }')
 
         self._pixmap_label = QLabel(self)
         self._pixmap = QPixmap(self._area.n, self._area.m)
@@ -55,7 +57,10 @@ class GUI(QWidget):
 
         grid = QGridLayout(self)
         grid.addWidget(self._pop_count_label, 0, 0)
-        grid.addWidget(self._pixmap_label, 1, 0)
+        grid.addWidget(self._vulnerable_count_label, 1, 0)
+        grid.addWidget(self._sick_count_label, 1, 1)
+        grid.addWidget(self._immune_count_label, 1, 2)
+        grid.addWidget(self._pixmap_label, 2, 0, 2, 3)
         self.setLayout(grid)
 
         self.move(300, 100)
@@ -71,15 +76,18 @@ class GUI(QWidget):
 
     def refresh(self):
         try:
-            self._refresh_pop_count()
+            self._refresh_counts()
             self._redraw_pixmap()
             self._simulation.process()
         except:  # noqa
             traceback.print_exc()
             exit()
 
-    def _refresh_pop_count(self):
+    def _refresh_counts(self):
         self._pop_count_label.setText(f'Population: {self._pop.total_count}')
+        self._vulnerable_count_label.setText(f'Vulnerable: {self._pop.vulnerable_count}')
+        self._sick_count_label.setText(f'Sick: {self._pop.sick_count}')
+        self._immune_count_label.setText(f'Immune: {self._pop.immune_count}')
 
     def _redraw_pixmap(self):
         painter = QPainter(self._pixmap)

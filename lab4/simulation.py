@@ -4,10 +4,15 @@ import random
 from collections import UserDict, defaultdict
 from typing import Tuple, DefaultDict
 
-from lab4.states import Person, VulnerableState, SympthomaticState, AsympthomaticState
+from lab4.states import Person, VulnerableState, SympthomaticState, AsympthomaticState, ImmuneState
 
 
 class Population(UserDict):
+    _vulnerable = VulnerableState()
+    _immune = ImmuneState()
+    _sympthomatic = SympthomaticState()
+    _asympthomatic = AsympthomaticState()
+
     def generate_starting(self, n, m, count):
         self.update({
             Person(VulnerableState()): (random.randrange(0, n), random.randrange(0, m))
@@ -18,6 +23,18 @@ class Population(UserDict):
     @property
     def total_count(self):
         return len(self)
+
+    @property
+    def vulnerable_count(self):
+        return len(list(filter(lambda p: p.state == self._vulnerable, self)))
+
+    @property
+    def sick_count(self):
+        return len(list(filter(lambda p: p.state in [self._sympthomatic, self._asympthomatic], self)))
+
+    @property
+    def immune_count(self):
+        return len(list(filter(lambda p: p.state == self._immune, self)))
 
 
 class Area:
