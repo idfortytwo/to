@@ -3,7 +3,7 @@ import math
 import random
 from collections import UserDict, defaultdict
 from copy import deepcopy
-from typing import Tuple, DefaultDict, List, Dict
+from typing import Tuple, DefaultDict, List
 
 from lab4.states import Person, VulnerableState, SympthomaticState, AsympthomaticState, ImmuneState
 
@@ -14,9 +14,10 @@ class Population(UserDict):
     _sympthomatic = SympthomaticState()
     _asympthomatic = AsympthomaticState()
 
-    def generate_starting(self, n, m, count):
+    def generate_starting(self, n, m, count, immune_p):
         self.update({
-            Person(VulnerableState()): (random.randrange(0, n), random.randrange(0, m))
+            Person(ImmuneState()) if random.random() < immune_p else Person(VulnerableState()):
+                (random.randrange(0, n), random.randrange(0, m))
             for _
             in range(count)
         })
@@ -66,11 +67,12 @@ class Memento:
 
 
 class Simulation:
-    def __init__(self, n: int, m: int, starting_pop_count: int, grow_count: int, grow_p: float):
+    def __init__(self, n: int, m: int, starting_pop_count: int, grow_count: int, grow_p: float, immune_p: float = 0):
         self._area = Area(n, m)
         self._starting_pop_count = starting_pop_count
         self._grow_count = grow_count
         self._grow_p = grow_p
+        self._immune_p = immune_p
 
         self._pop: Population[Person, Tuple[float, float]] = Population()
         self._prev_contacts: DefaultDict[Tuple[Person, Person], int] = defaultdict(int)
@@ -78,6 +80,8 @@ class Simulation:
 
         self._turn: int = 0
         self._mementos: List[Memento] = []
+
+        self._setup_pop()
 
     @property
     def area(self):
@@ -87,8 +91,8 @@ class Simulation:
     def pop(self):
         return self._pop
 
-    def setup_pop(self):
-        self._pop.generate_starting(self.area.n, self.area.m, self._starting_pop_count)
+    def _setup_pop(self):
+        self._pop.generate_starting(self.area.n, self.area.m, self._starting_pop_count, self._immune_p)
         self.create()
 
     def restore(self, turn: int):
@@ -146,15 +150,17 @@ class Simulation:
             starting_point = (random.choice([0, self.area.n]), random.randrange(0, self.area.n))
         return starting_point
 
-    @staticmethod
-    def _gen_newcomer_state():
+    def _gen_newcomer_state(self):
         if random.random() < 0.1:
             if random.getrandbits(1):
                 state = SympthomaticState()
             else:
                 state = AsympthomaticState()
         else:
-            state = VulnerableState()
+            if random.random() < self._immune_p:
+                state = ImmuneState()
+            else:
+                state = VulnerableState()
         return state
 
     def _add_people(self):

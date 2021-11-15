@@ -49,7 +49,6 @@ class GUI(QWidget):
         }
 
         self._init_UI()
-        self._simulation.setup_pop()
 
         self._turn = 0
         self._refresh_counts()
