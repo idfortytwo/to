@@ -2,7 +2,7 @@ import itertools
 import math
 import random
 from collections import UserDict, defaultdict
-from typing import Tuple, DefaultDict
+from typing import Tuple, DefaultDict, List
 
 from lab4.states import Person, VulnerableState, SympthomaticState, AsympthomaticState, ImmuneState
 
@@ -51,6 +51,19 @@ class Area:
         return self._m
 
 
+class Memento:
+    def __init__(self, pop: Population[Person, Tuple[float, float]],
+                 prev_contacts: DefaultDict[Tuple[Person, Person], int],
+                 curr_contacts: DefaultDict[Tuple[Person, Person], int]):
+        self._pop = pop.copy()
+        self._prev_contacts = prev_contacts.copy()
+        self._curr_contacts = curr_contacts.copy()
+
+    @property
+    def state(self):
+        return self._pop, self._prev_contacts, self._curr_contacts
+
+
 class Simulation:
     def __init__(self, n: int, m: int, starting_pop_count: int, grow_count: int, grow_p: float):
         self._area = Area(n, m)
@@ -64,7 +77,8 @@ class Simulation:
         self._prev_contacts: DefaultDict[Tuple[Person, Person], int] = defaultdict(int)
         self._curr_contacts: DefaultDict[Tuple[Person, Person], int] = defaultdict(int)
 
-        self.count = 0
+        self._turn: int = 0
+        self._mementos: List[Memento] = []
 
     @property
     def area(self):
@@ -74,16 +88,30 @@ class Simulation:
     def pop(self):
         return self._pop
 
+    @property
+    def turn(self):
+        return self._turn
+
+    def restore(self, turn: int):
+        if res := (0 <= turn < len(self._mementos)):
+            self._pop, self._prev_contacts, self._curr_contacts = self._mementos[turn].state
+            self._turn = turn
+            print(f'restored turn {self._turn}: {self._pop.total_count}')
+        else:
+            print('no momento')
+        return res
+
+    def create(self):
+        self._mementos.insert(self._turn, Memento(self._pop, self._prev_contacts, self._curr_contacts))
+        self._turn += 1
+
     def process(self):
         self._move_people()
         self._add_people()
         self._check_proximity()
         self._check_contacts()
 
-        # self._test_comb()
-        # for k, v in self._curr_contacts.items():
-        #     print(k, v)
-        # exit()
+        self.create()
 
     @staticmethod
     def _gen_vector():
