@@ -2,7 +2,8 @@ import itertools
 import math
 import random
 from collections import UserDict, defaultdict
-from typing import Tuple, DefaultDict, List
+from copy import deepcopy
+from typing import Tuple, DefaultDict, List, Dict
 
 from lab4.states import Person, VulnerableState, SympthomaticState, AsympthomaticState, ImmuneState
 
@@ -55,9 +56,9 @@ class Memento:
     def __init__(self, pop: Population[Person, Tuple[float, float]],
                  prev_contacts: DefaultDict[Tuple[Person, Person], int],
                  curr_contacts: DefaultDict[Tuple[Person, Person], int]):
-        self._pop = pop.copy()
-        self._prev_contacts = prev_contacts.copy()
-        self._curr_contacts = curr_contacts.copy()
+        self._pop = deepcopy(pop)
+        self._prev_contacts = deepcopy(prev_contacts)
+        self._curr_contacts = deepcopy(curr_contacts)
 
     @property
     def state(self):
@@ -72,8 +73,6 @@ class Simulation:
         self._grow_p = grow_p
 
         self._pop: Population[Person, Tuple[float, float]] = Population()
-        self._pop.generate_starting(n, m, starting_pop_count)
-
         self._prev_contacts: DefaultDict[Tuple[Person, Person], int] = defaultdict(int)
         self._curr_contacts: DefaultDict[Tuple[Person, Person], int] = defaultdict(int)
 
@@ -88,17 +87,14 @@ class Simulation:
     def pop(self):
         return self._pop
 
-    @property
-    def turn(self):
-        return self._turn
+    def setup_pop(self):
+        self._pop.generate_starting(self.area.n, self.area.m, self._starting_pop_count)
+        self.create()
 
     def restore(self, turn: int):
         if res := (0 <= turn < len(self._mementos)):
             self._pop, self._prev_contacts, self._curr_contacts = self._mementos[turn].state
             self._turn = turn
-            print(f'restored turn {self._turn}: {self._pop.total_count}')
-        else:
-            print('no momento')
         return res
 
     def create(self):

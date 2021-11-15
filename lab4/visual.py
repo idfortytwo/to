@@ -35,12 +35,11 @@ class RefreshThread(QThread):
 
 
 class GUI(QWidget):
-    def __init__(self, simulation: Simulation, turns_per_second: int = 1):
+    def __init__(self, simulation: Simulation, turns_per_second: int = 1, preload_turns: int = 0):
         super().__init__()
         self._simulation = simulation
         self._area = self._simulation.area
         self._turns_per_second = turns_per_second
-
         self._area_rect = QRect(0, 0, self._area.n - 1, self._area.m - 1)
         self._state_colors = {
             ImmuneState(): QColor(0, 204, 102),
@@ -49,12 +48,21 @@ class GUI(QWidget):
             AsympthomaticState(): QColor(255, 153, 0)
         }
 
-        self.initUI()
+        self._init_UI()
+        self._simulation.setup_pop()
 
-        self._thread = RefreshThread(self, turns_per_second=self._turns_per_second)
-        # self._start_refresh_thread()
+        self._turn = 0
+        self._refresh_counts()
+        self._refresh_pixmap()
 
-    def initUI(self):
+        self.preload_turns(preload_turns)
+
+        self._refresh_thread = RefreshThread(self, turns_per_second=self._turns_per_second)
+        self._start_refresh_thread()
+
+        self.show()
+
+    def _init_UI(self):
         self._pop_count_label = QLabel(self)
         self._turn_label = QLabel(self)
         self._sick_count_label = QLabel(self)
@@ -75,25 +83,39 @@ class GUI(QWidget):
         grid.addWidget(self._immune_count_label, 1, 2)
         grid.addWidget(self._pixmap_label, 2, 0, 2, 3)
         self.setLayout(grid)
+        self._setup_pixmap()
 
         self.move(300, 100)
         self.setWindowTitle('Simulation')
-        self.show()
+
+    def preload_turns(self, turns):
+        for _ in range(turns):
+            self._simulation.process()
 
     def _start_refresh_thread(self):
-        self._thread.start()
-        self._thread.finished.connect(lambda: self._next_turn())  # noqa
+        self._refresh_thread.start()
+        self._refresh_thread.finished.connect(lambda: self._load_next_turn())  # noqa
 
-    def _next_turn(self):
-        self._simulation.process()
+    def _load_prev_turn(self):
+        if self._turn > 0:
+            self._turn -= 1
+            self._load_turn(self._turn)
+
+    def _load_next_turn(self):
+        self._turn += 1
+        self._load_turn(self._turn)
+
+    def _load_turn(self, turn):
+        if not self._simulation.restore(turn):
+            self._simulation.process()
         self._refresh()
 
     def _refresh(self):
-        self._refresh_pixmap()
         self._refresh_counts()
+        self._refresh_pixmap()
 
     def _refresh_counts(self):
-        self._turn_label.setText(f'Turn: {self._simulation.turn}')
+        self._turn_label.setText(f'Turn: {self._turn}')
         self._pop_count_label.setText(f'Population: {self._simulation.pop.total_count}')
         self._vulnerable_count_label.setText(f'Vulnerable: {self._simulation.pop.vulnerable_count}')
         self._sick_count_label.setText(f'Sick: {self._simulation.pop.sick_count}')
@@ -114,16 +136,23 @@ class GUI(QWidget):
         self._pixmap_label.setPixmap(self._pixmap.scaledToHeight(500))
         self._pixmap_label.update()
 
+    def _setup_pixmap(self):
+        painter = QPainter(self._pixmap)
+        painter.fillRect(self._area_rect, QColor(255, 255, 255, 255))
+        painter.setPen(QColor(200, 200, 200, 255))
+        painter.drawRect(self._area_rect)
+        painter.end()
+
+        self._pixmap_label.setPixmap(self._pixmap.scaledToHeight(500))
+        self._pixmap_label.update()
+
     def keyPressEvent(self, event: QKeyEvent):
         match event.key():
             case QtCore.Qt.Key_Left:
-                print('turn <', self._simulation.turn)
-                self._simulation.restore(self._simulation.turn - 1)
-                self._refresh()
+                self._load_prev_turn()
+
             case QtCore.Qt.Key_Right:
-                print('turn >', self._simulation.turn)
-                if not self._simulation.restore(self._simulation.turn + 1):
-                    self._simulation.process()
-                self._refresh()
+                self._load_next_turn()
+
             case QtCore.Qt.Key_Space:
-                pass
+                self._refresh_thread.paused = not self._refresh_thread.paused
