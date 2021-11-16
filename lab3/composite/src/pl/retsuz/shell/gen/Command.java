@@ -23,43 +23,43 @@ public abstract class Command implements ICommand {
     ICommandVariation _default;
 
 
-    public Command(String prefix, IContext ctx, ICommand next, ICommandVariation def, String info){
-        this.context=ctx;
-        this.prefix=prefix;
+    public Command(String prefix, IContext ctx, ICommand next, ICommandVariation def, String info) {
+        this.context = ctx;
+        this.prefix = prefix;
         this.next = next;
-        this.generalPattern = Pattern.compile(prefix+" *([a-zA-Z0-9.l\\/_]*)");
-        this._default=def;
-        this.man=info;
+        this.generalPattern = Pattern.compile(prefix + " *([a-zA-Z0-9.l\\/_]*)");
+        this._default = def;
+        this.man = info;
     }
 
-    private boolean checkPrefix(String command){
+    private boolean checkPrefix(String command) {
         Matcher m = generalPattern.matcher(command);
         return m.matches();
     }
 
     public void perform(String command) throws Exception {
-        if(!checkPrefix(command)){
+        if (!checkPrefix(command)) {
 
-            if(this.next!=null)
+            if (this.next != null)
                 this.next.perform(command);
             else throw new Exception("Polecenie nie istnieje.");
-        }else{
+        } else {
             Matcher m = generalPattern.matcher(command);
-            String params="";
+            String params = "";
 
-            if(m.find()){
-                params=m.group(1);
+            if (m.find()) {
+                params = m.group(1);
             }
 
             this._default.processVariation(params);
         }
     }
 
-    public String man(){
+    public String man() {
         return this.man;
     }
 
-    public IContext getContext(){
+    public IContext getContext() {
         return this.context;
     }
 }

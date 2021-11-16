@@ -10,10 +10,10 @@ public abstract class CommandVariation implements ICommandVariation {
     ICommand parent;
     Pattern generalPattern;
 
-    public CommandVariation(ICommandVariation next, ICommand parent, String pattern){
-        this.next=next;
+    public CommandVariation(ICommandVariation next, ICommand parent, String pattern) {
+        this.next = next;
         this.parent = parent;
-        this.generalPattern=Pattern.compile(pattern);
+        this.generalPattern = Pattern.compile(pattern);
     }
 
     public ICommandVariation getNext() {
@@ -33,18 +33,18 @@ public abstract class CommandVariation implements ICommandVariation {
         this.parent = parent;
     }
 
-    protected boolean match(String command){
+    protected boolean match(String command) {
         Matcher m = generalPattern.matcher(command);
         return m.matches();
     }
 
     public void processVariation(String params) throws Exception {
-        if(!match(params)){
+        if (!match(params)) {
 
-            if(this.next!=null)
+            if (this.next != null)
                 this.next.processVariation(params);
             else throw new Exception("Polecenie nie istnieje.");
-        }else{
+        } else {
             this.make(params);
         }
     }

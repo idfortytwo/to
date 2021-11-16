@@ -1,6 +1,6 @@
 package pl.retsuz.filesystem;
 
-public class TextFile extends GeneralComposite{
+public class TextFile extends GeneralComposite {
     String content;
 
     public String getContent() {

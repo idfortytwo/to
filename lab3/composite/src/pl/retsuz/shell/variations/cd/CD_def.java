@@ -7,13 +7,13 @@ import pl.retsuz.shell.variations.gen.ICommandVariation;
 
 public class CD_def extends CommandVariation {
     public CD_def(ICommandVariation next, ICommand parent) {
-        super(next,parent,"");
+        super(next, parent, "");
     }
+
     @Override
     public void make(String params) {
 
         System.out.println("Zbyt mała liczba parametrów!");
-
 
 
     }

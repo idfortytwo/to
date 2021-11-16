@@ -13,11 +13,11 @@ public class LS_ddot extends CommandVariation {
     @Override
     public void make(String params) {
 
-        Composite c= (Composite) (this.getParent().getContext().getCurrent());
-        if(c.getParent()!=null) {
+        Composite c = (Composite) (this.getParent().getContext().getCurrent());
+        if (c.getParent() != null) {
             c = (Composite) c.getParent();
             System.out.print(c.ls(" "));
-        }else{
+        } else {
             System.out.println("Brak elementu nadrzędnego.");
         }
     }

@@ -1,6 +1,6 @@
 package pl.retsuz.filesystem;
 
-public abstract class GeneralComposite implements IComposite{
+public abstract class GeneralComposite implements IComposite {
     protected String name;
     protected IComposite parent;
 
@@ -28,9 +28,9 @@ public abstract class GeneralComposite implements IComposite{
         return name.equals(that.getName());
     }
 
-    public String getPath(){
-        if(this.parent==null)return this.name;
-        else return this.parent.getPath()+"/"+this.getName();
+    public String getPath() {
+        if (this.parent == null) return this.name;
+        else return this.parent.getPath() + "/" + this.getName();
     }
 
 }

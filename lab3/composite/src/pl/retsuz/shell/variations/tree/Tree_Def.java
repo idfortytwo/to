@@ -7,12 +7,13 @@ import pl.retsuz.shell.variations.gen.ICommandVariation;
 
 public class Tree_Def extends CommandVariation {
     public Tree_Def(ICommandVariation next, ICommand parent) {
-        super(next,parent,"");
+        super(next, parent, "");
     }
+
     @Override
     public void make(String params) {
 
-        Composite c= (Composite) (this.getParent().getContext().getCurrent());
+        Composite c = (Composite) (this.getParent().getContext().getCurrent());
 
         System.out.print(c.tree(" "));
 
