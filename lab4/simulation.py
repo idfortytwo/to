@@ -102,8 +102,8 @@ class Simulation:
         return res
 
     def create(self):
-        self._mementos.insert(self._turn, Memento(self._pop, self._prev_contacts, self._curr_contacts))
         self._turn += 1
+        self._mementos.insert(self._turn, Memento(self._pop, self._prev_contacts, self._curr_contacts))
 
     def process(self):
         self._move_people()
