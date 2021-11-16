@@ -39,5 +39,7 @@ public class MV_Path extends CommandVariation {
             System.out.println("mv nie powiodło się");
             e.printStackTrace();
         }
+
+        System.out.println("Przeniesiono");
     }
 }

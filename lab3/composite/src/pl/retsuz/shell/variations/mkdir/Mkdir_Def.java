@@ -1,16 +1,16 @@
-package pl.retsuz.shell.variations.mv;
+package pl.retsuz.shell.variations.mkdir;
 
 import pl.retsuz.shell.gen.ICommand;
 import pl.retsuz.shell.variations.gen.CommandVariation;
 import pl.retsuz.shell.variations.gen.ICommandVariation;
 
-public class MV_Def extends CommandVariation {
-    public MV_Def(ICommandVariation next, ICommand parent) {
+public class Mkdir_Def extends CommandVariation {
+    public Mkdir_Def(ICommandVariation next, ICommand parent) {
         super(next, parent, "");
     }
 
     @Override
     public void make(String params) {
-        System.out.println("mv potrzebuje dwóch argumentów");
+        System.out.println("mkdir potrzebuje jednego argumentu");
     }
 }

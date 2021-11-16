@@ -16,7 +16,6 @@ public class RM_Path extends CommandVariation {
         Composite c = (Composite) (this.getParent().getContext().getCurrent());
 
         try {
-            System.out.println(params);
             IComposite elem = c.findElementByPath(params);
             Composite parent = (Composite) elem.getParent();
             parent.removeElement(elem);

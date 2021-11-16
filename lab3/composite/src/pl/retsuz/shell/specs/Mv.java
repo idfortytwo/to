@@ -6,6 +6,6 @@ import pl.retsuz.shell.gen.ICommand;
 
 public class Mv extends Command {
     public Mv(IContext ctx, ICommand next) {
-        super("mv", ctx, next, null, "Użycie mv <sciezka>");
+        super("mv", ctx, next, null, "Użycie mv <sciezka> <sciezka>");
     }
 }

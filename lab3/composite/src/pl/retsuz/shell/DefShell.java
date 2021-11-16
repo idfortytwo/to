@@ -10,6 +10,8 @@ import pl.retsuz.shell.variations.gen.ICommandVariation;
 import pl.retsuz.shell.variations.ls.LS_Def;
 import pl.retsuz.shell.variations.ls.LS_Path;
 import pl.retsuz.shell.variations.ls.LS_ddot;
+import pl.retsuz.shell.variations.mkdir.Mkdir_Def;
+import pl.retsuz.shell.variations.mkdir.Mkdir_Path;
 import pl.retsuz.shell.variations.more.More_Def;
 import pl.retsuz.shell.variations.mv.MV_Def;
 import pl.retsuz.shell.variations.mv.MV_Path;
@@ -53,6 +55,11 @@ public abstract class DefShell {
         ICommandVariation mv_def = new MV_Def(mv_path, mv);
         mv.set_default(mv_def);
 
-        return mv;
+        ICommand mkdir = new Mkdir(ctx, mv);
+        ICommandVariation mkdir_path = new Mkdir_Path(null, mkdir);
+        ICommandVariation mkdir_def = new Mkdir_Def(mkdir_path, mkdir);
+        mkdir.set_default(mkdir_def);
+
+        return mkdir;
     }
 }
