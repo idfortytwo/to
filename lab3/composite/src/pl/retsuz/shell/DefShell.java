@@ -11,6 +11,8 @@ import pl.retsuz.shell.variations.ls.LS_Def;
 import pl.retsuz.shell.variations.ls.LS_Path;
 import pl.retsuz.shell.variations.ls.LS_ddot;
 import pl.retsuz.shell.variations.more.More_Def;
+import pl.retsuz.shell.variations.mv.MV_Def;
+import pl.retsuz.shell.variations.mv.MV_Path;
 import pl.retsuz.shell.variations.rm.RM_Def;
 import pl.retsuz.shell.variations.rm.RM_Path;
 import pl.retsuz.shell.variations.tree.Tree_Def;
@@ -41,11 +43,16 @@ public abstract class DefShell {
         ICommandVariation ls_def = new LS_Def(ls_ddot, ls);
         ls.set_default(ls_def);
 
-        ICommand rm = new Rm(ctx, cd);
+        ICommand rm = new Rm(ctx, ls);
         ICommandVariation rm_path = new RM_Path(null, rm);
         ICommandVariation rm_def = new RM_Def(rm_path, rm);
         rm.set_default(rm_def);
 
-        return rm;
+        ICommand mv = new Mv(ctx, rm);
+        ICommandVariation mv_path = new MV_Path(null, mv);
+        ICommandVariation mv_def = new MV_Def(mv_path, mv);
+        mv.set_default(mv_def);
+
+        return mv;
     }
 }
