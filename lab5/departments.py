@@ -1,12 +1,14 @@
 from typing import List
-from collections.abc     import Iterator
 
-from lab5.fire_engines import FireEngine
+from lab5.events import Event, EventType
+from lab5.execution import FireStrategy, LocalThreatStrategy
+from lab5.fire_engines import FireEngine, FireEngineSquad
 
 
 class Department:
-    def __init__(self, title: str):
+    def __init__(self, title: str, coords):
         self.title = title
+        self.coords = coords
         self.engines: List[FireEngine] = [FireEngine(f'{self.title}-{i}') for i in range(5)]
 
     def print_state(self):
@@ -17,27 +19,48 @@ class Department:
         return f"Department('{self.title}')"
 
 
-class DepartmentsIterator(Iterator):
+class DepartmentManager:
     def __init__(self, departments: List[Department]):
         self._departments = departments
-        self._n = 0
+        self._sender = FireEngineSender()
 
-    def __iter__(self):
-        self._n = 0
-        return self
+    @property
+    def departments(self):
+        return self._departments
 
-    def __next__(self) -> Department:
-        if self._n < len(self._departments):
-            val = self._departments[self._n]
-            self._n += 1
-            return val
-        else:
-            raise StopIteration
+    @property
+    def sender(self):
+        return self._sender
+
+    def react_to_event(self, event: Event):
+        match event.event_type:
+            case EventType.FIRE:
+                self.strategy = FireStrategy(self.departments)
+            case EventType.LOCAL_THREAT:
+                self.strategy = LocalThreatStrategy(self.departments)
+
+        engines = self.strategy.request_engines(event)
+
+        squad = FireEngineSquad(engines)
+        self.sender.add_squad(squad)
+        self.sender.send()
 
 
-class DepartmentsManagement:
-    def __init__(self, departments: List[Department]):
-        self.departments_iterator = DepartmentsIterator(departments)
+class FireEngineSender:
+    def __init__(self, squads: List[FireEngineSquad] = None):
+        self._squads = squads if squads else []
 
-    def call(self):
-        pass
+    @property
+    def squads(self):
+        return self._squads
+
+    def add_squad(self, squad: FireEngineSquad):
+        self.squads.append(squad)
+
+    def remove_squad(self, squad: FireEngineSquad):
+        self.squads.remove(squad)
+
+    def send(self):
+        for squad in self.squads:
+            squad.send()
+            self.remove_squad(squad)

@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import random
+import time
 from abc import ABC, abstractmethod
+from threading import Thread
+from typing import List
 
 
 class FireEngineState(ABC):
@@ -75,4 +79,36 @@ class FireEngine:
         self._state.handle_busy()
 
     def __repr__(self):
-        return f'FireEngine(\'{self._state}\')'
+        return f"FireEngine('{self.name}', {self._state})"
+
+
+class FireEngineSquad:
+    def __init__(self, engines: List[FireEngine]):
+        self._engines = engines
+
+    @property
+    def engines(self):
+        return self._engines
+
+    def _depart(self, delay: float = None):
+        delay = delay if delay else random.random() * 3
+        print('departing ' + ', '.join(str(engine) for engine in self.engines))
+        for engine in self.engines:
+            engine.set_state(BusyState())
+
+        thread = Thread(target=lambda: (time.sleep(delay), self._depart_back()))
+        thread.start()
+
+    def _depart_back(self, delay: float = None):
+        delay = delay if delay else random.random() * 3
+        print('arrived ' + ', '.join(str(engine) for engine in self.engines))
+        thread = Thread(target=lambda: (time.sleep(delay), self._return()))
+        thread.start()
+
+    def _return(self):
+        for engine in self.engines:
+            engine.set_state(ReadyState())
+        print('returned ' + ', '.join(str(engine) for engine in self.engines))
+
+    def send(self):
+        self._depart()
