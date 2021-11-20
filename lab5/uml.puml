@@ -1,0 +1,54 @@
+@startuml
+
+abstract class FireEngineState {
+    + fire_engine: FireEngine
+    + handle_ready()
+    + handle_busy()
+}
+class ReadyState
+class BusyState
+ReadyState .d-|> FireEngineState
+BusyState .d-|> FireEngineState
+
+class FireEngine {
+    + {r/o} name
+    + {r/o} state
+    + set_state(state: FireEngineState)
+    + request_ready()
+    + request_busy()
+}
+FireEngine "1" o-u-o "1" FireEngineState
+
+enum EventType {
+    + {static} FIRE
+    + {static} FALSE_ALARM
+    + {static} LOCAL_THREAT
+}
+class Event {
+    + event_type: EventType
+    + coords: Tuple[float, float]
+}
+Event .u-o EventType
+
+class Department {
+    + title: str
+    + engines: [FireEngine]
+}
+abstract class Iterator
+class DepartmentsIterator {
+    + __iter__(): DepartmentsIterator
+    + __next__(): Department
+}
+class DepartmentsManager {
+    + departments_iterator
+    + call()
+}
+DepartmentsIterator -r|> Iterator
+DepartmentsIterator "1" --o "n" Department
+DepartmentsManager "1" --* "n" DepartmentsIterator
+
+Department "1" --* "n" FireEngine
+
+
+
+@enduml
