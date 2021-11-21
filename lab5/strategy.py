@@ -2,16 +2,19 @@ import random
 import time
 from abc import ABC, abstractmethod
 from threading import Thread
-from typing import List, Callable
+from typing import List, Callable, TYPE_CHECKING
 
 from lab5.iterators import ClosestEnginesIterator
 from lab5.events import Event
 from lab5.fire_engines import FireEngine, FireEngineSquad, BusyState, ReadyState
 
+if TYPE_CHECKING:
+    from lab5.departments import Department
+
 
 class PreparationStrategy(ABC):
-    def __init__(self, departments: List):
-        self.departments = departments
+    def __init__(self, departments: List['Department']):
+        self._departments = departments
         self._squad: FireEngineSquad
 
     @abstractmethod
@@ -20,7 +23,7 @@ class PreparationStrategy(ABC):
 
     def _request_n_engines(self, event: Event, n: int) -> List[FireEngine]:
         engines = []
-        engines_it = iter(ClosestEnginesIterator(self.departments, event))
+        engines_it = iter(ClosestEnginesIterator(self._departments, event))
         accepted_engines = 0
 
         while accepted_engines < n:
@@ -52,32 +55,28 @@ class ExecutionStrategy:
     def __init__(self, squad: FireEngineSquad):
         self._squad = squad
 
-    @property
-    def squad(self):
-        return self._squad
-
     @staticmethod
     def _next_step(delay: float, func: Callable):
         thread = Thread(target=lambda: (time.sleep(delay), func()))
         thread.start()
 
     def _depart(self):
-        print('| ->  ' + ', '.join(str(engine) for engine in self.squad))
-        for engine in self.squad:
+        print('| ->  ' + ', '.join(str(engine) for engine in self._squad))
+        for engine in self._squad:
             engine.set_state(BusyState())
 
         travel_delay = random.random() * 3
         self._next_step(travel_delay, self._depart_back)
 
     def _depart_back(self):
-        print('-> [] ' + ', '.join(str(engine) for engine in self.squad))
+        print('-> [] ' + ', '.join(str(engine) for engine in self._squad))
 
         travel_delay = random.random() * 3
         self._next_step(travel_delay, self._return)
 
     def _return(self):
-        print('| <-  ' + ', '.join(str(engine) for engine in self.squad))
-        for engine in self.squad:
+        print('| <-  ' + ', '.join(str(engine) for engine in self._squad))
+        for engine in self._squad:
             engine.set_state(ReadyState())
 
     def send(self):

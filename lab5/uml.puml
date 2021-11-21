@@ -2,13 +2,19 @@
 
 abstract class FireEngineState {
     + fire_engine: FireEngine
+    + {abstract} handle_ready()
+    + {abstract} handle_busy()
+}
+class ReadyState {
     + handle_ready()
     + handle_busy()
 }
-class ReadyState
-class BusyState
-ReadyState .d-|> FireEngineState
-BusyState .d-|> FireEngineState
+class BusyState {
+    + handle_ready()
+    + handle_busy()
+}
+ReadyState .u-|> FireEngineState
+BusyState .u-|> FireEngineState
 
 class FireEngine {
     + {r/o} name
@@ -17,7 +23,17 @@ class FireEngine {
     + request_ready()
     + request_busy()
 }
-FireEngine "1" o-u-o "1" FireEngineState
+FireEngine "1" o-r-o "1" FireEngineState
+
+class FireEngineSquad {
+    + {r/o} engines: List[FireEngine]
+    - _strategy: ExecutionStrategy
+    + send()
+    + __iter__(): List[FireEngine]
+}
+FireEngineSquad "1" --o "n" FireEngine
+FireEngineSquad "1" o--* "1" ExecutionStrategy
+
 
 enum EventType {
     + {static} FIRE
@@ -28,27 +44,74 @@ class Event {
     + event_type: EventType
     + coords: Tuple[float, float]
 }
-Event .u-o EventType
+Event .d-o EventType
 
 class Department {
     + title: str
     + engines: [FireEngine]
 }
-abstract class Iterator
-class DepartmentsIterator {
-    + __iter__(): DepartmentsIterator
-    + __next__(): Department
+abstract class Iterator {
+    + {abstract} __iter__()
+    + {abstract} __next__()
 }
-class DepartmentsManager {
-    + departments_iterator
-    + call()
+class ClosestEnginesIterator {
+    - _departments: List[Department]
+    - _department_i: int
+    - _engine_i: int
+    + __iter__(): ClosestEnginesIterator
+    + __next__(): FireEngine
 }
-DepartmentsIterator -r|> Iterator
-DepartmentsIterator "1" --o "n" Department
-DepartmentsManager "1" --* "n" DepartmentsIterator
+ClosestEnginesIterator --r|> Iterator
+ClosestEnginesIterator -- Event
+ClosestEnginesIterator .-> FireEngineState
 
 Department "1" --* "n" FireEngine
 
+abstract class PreparationStrategy {
+    - _departments: List[Department]
+    - _squad: FireEngineSquad
+    + {abstract}  request_squad(Event): FireEngineSquad
+    - _request_n_engines(Event, int): List[FireEngine]
+}
+PreparationStrategy "1" -r-* "1" ClosestEnginesIterator
+class FirePreparationStrategy {
+    + request_squad(Event): FireEngineSquad
+}
+class LocalThreatPreparationStrategy {
+    + request_squad(Event): FireEngineSquad
+}
+FirePreparationStrategy .d-|> PreparationStrategy
+LocalThreatPreparationStrategy .d-|> PreparationStrategy
 
+class ExecutionStrategy {
+    - _squad: FireEngineSquad
+    + send()
+    - {static} _next_step(delay: float, Callable)
+    - _depart()
+    - _depart_back()
+    - _return()
+}
+
+
+class DepartmentsManager {
+    + {r/o} departments: List[Departments]
+    - _strategy: PreparationStrategy
+    - _sender: FireEngineSender
+    + react_to_event(Event)
+}
+DepartmentsManager "1" -u-* "1" PreparationStrategy
+DepartmentsManager -r- Event
+DepartmentsManager .l-> EventType
+DepartmentsManager "1" --o "n" Department
+
+
+class FireEngineSender {
+    + {r/o} squads: List[FireEngineSquad]
+    + add_squad(FireEngineSquad)
+    + remove_squad(FireEngineSquad)
+    + notify()
+}
+DepartmentsManager "1" -l-* "1" FireEngineSender
+FireEngineSender "1" -d-o "n" FireEngineSquad
 
 @enduml

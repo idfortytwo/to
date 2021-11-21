@@ -1,11 +1,15 @@
-from typing import Iterator, List
+from __future__ import annotations
+from typing import Iterator, List, TYPE_CHECKING
 
 from lab5.events import Event
 from lab5.fire_engines import FireEngine, ReadyState
 
+if TYPE_CHECKING:
+    from lab5.departments import Department
+
 
 class ClosestEnginesIterator(Iterator):
-    def __init__(self, departments: List, event: Event):
+    def __init__(self, departments: List['Department'], event: Event):
         self._departments = sorted(departments, key=lambda d: self.distance(d.coords, event.coords))
         self._department_i = 0
         self._engine_i = 0
@@ -16,7 +20,7 @@ class ClosestEnginesIterator(Iterator):
         x2, y2 = coord_2
         return abs((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
 
-    def __iter__(self):
+    def __iter__(self) -> ClosestEnginesIterator:
         self._department_i = 0
         self._engine_i = 0
         return self

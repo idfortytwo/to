@@ -1,7 +1,7 @@
 from typing import List
 
 from lab5.events import Event, EventType
-from lab5.strategy import FirePreparationStrategy, LocalThreatPreparationStrategy
+from lab5.strategy import FirePreparationStrategy, LocalThreatPreparationStrategy, PreparationStrategy
 from lab5.fire_engines import FireEngine, FireEngineSquad
 
 
@@ -22,27 +22,24 @@ class Department:
 class DepartmentManager:
     def __init__(self, departments: List[Department]):
         self._departments = departments
+        self._strategy: PreparationStrategy
         self._sender = FireEngineSender()
 
     @property
     def departments(self):
         return self._departments
 
-    @property
-    def sender(self):
-        return self._sender
-
     def react_to_event(self, event: Event):
         match event.event_type:
             case EventType.FIRE:
-                self.strategy = FirePreparationStrategy(self.departments)
+                self._strategy = FirePreparationStrategy(self.departments)
             case EventType.LOCAL_THREAT:
-                self.strategy = LocalThreatPreparationStrategy(self.departments)
+                self._strategy = LocalThreatPreparationStrategy(self.departments)
 
-        squad = self.strategy.request_squad(event)
-        self.sender.add_squad(squad)
-        self.sender.send()
-        self.sender.remove_squad(squad)
+        squad = self._strategy.request_squad(event)
+        self._sender.add_squad(squad)
+        self._sender.notify()
+        self._sender.remove_squad(squad)
 
 
 class FireEngineSender:
@@ -59,6 +56,6 @@ class FireEngineSender:
     def remove_squad(self, squad: FireEngineSquad):
         self.squads.remove(squad)
 
-    def send(self):
+    def notify(self):
         for squad in self.squads:
             squad.send()
