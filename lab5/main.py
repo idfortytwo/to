@@ -18,10 +18,18 @@ departments = [
 # print(departments)
 
 SKKM = DepartmentManager(departments)
-ev = Event(EventType.FIRE, (50, 20))
-SKKM.react_to_event(ev)
-time.sleep(5)
-SKKM.react_to_event(ev)
+fire_1 = Event(EventType.FIRE, (50, 20))
+local_threat_1 = Event(EventType.LOCAL_THREAT, (50, 19.8))
+local_threat_2 = Event(EventType.LOCAL_THREAT, (50, 19.8))
+fire_3 = Event(EventType.FIRE, (50, 19.8))
+
+SKKM.react_to_event(fire_1)
+time.sleep(1)
+SKKM.react_to_event(local_threat_1)
+time.sleep(1)
+SKKM.react_to_event(local_threat_2)
+time.sleep(1)
+SKKM.react_to_event(fire_3)
 
 # cei = ClosestEnginesIterator(departments, ev)
 # for en in cei:

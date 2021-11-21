@@ -1,7 +1,7 @@
 from typing import List
 
 from lab5.events import Event, EventType
-from lab5.execution import FireStrategy, LocalThreatStrategy
+from lab5.strategy import FirePreparationStrategy, LocalThreatPreparationStrategy
 from lab5.fire_engines import FireEngine, FireEngineSquad
 
 
@@ -35,15 +35,14 @@ class DepartmentManager:
     def react_to_event(self, event: Event):
         match event.event_type:
             case EventType.FIRE:
-                self.strategy = FireStrategy(self.departments)
+                self.strategy = FirePreparationStrategy(self.departments)
             case EventType.LOCAL_THREAT:
-                self.strategy = LocalThreatStrategy(self.departments)
+                self.strategy = LocalThreatPreparationStrategy(self.departments)
 
-        engines = self.strategy.request_engines(event)
-
-        squad = FireEngineSquad(engines)
+        squad = self.strategy.request_squad(event)
         self.sender.add_squad(squad)
         self.sender.send()
+        self.sender.remove_squad(squad)
 
 
 class FireEngineSender:
@@ -63,4 +62,3 @@ class FireEngineSender:
     def send(self):
         for squad in self.squads:
             squad.send()
-            self.remove_squad(squad)
