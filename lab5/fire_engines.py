@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, Type
+from typing import List, Type, Iterable
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -86,7 +86,7 @@ class FireEngine:
         return str(self.name)
 
 
-class FireEngineSquad:
+class FireEngineSquad(Iterable):
     def __init__(self, engines: List[FireEngine], Strategy: Type['ExecutionStrategy']):
         self._engines = engines
         self._strategy = Strategy(self)

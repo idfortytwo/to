@@ -25,6 +25,9 @@ class FireEngine {
 }
 FireEngine "1" o-r-o "1" FireEngineState
 
+abstract class Iterable {
+    + {abstract} __iter__()
+}
 class FireEngineSquad {
     + {r/o} engines: List[FireEngine]
     - _strategy: ExecutionStrategy
@@ -53,14 +56,16 @@ class Department {
 }
 abstract class Iterator {
     + {abstract} __iter__()
+    + {abstract} __next__()
 }
 class ClosestEnginesIterator {
     - _departments: List[Department]
     - _department_i: int
     - _engine_i: int
     + __iter__(): ClosestEnginesIterator
+    + __next__(): Engine
 }
-ClosestEnginesIterator --r|> Iterator
+ClosestEnginesIterator .-r|> Iterator
 ClosestEnginesIterator -- Event
 ClosestEnginesIterator .-> FireEngineState
 
@@ -131,6 +136,7 @@ class FireEngineSender {
     + notify()
 }
 DepartmentsManager "1" -l-* "1" FireEngineSender
+FireEngineSquad .u|> Iterable
 FireEngineSender "1" -d-o "n" FireEngineSquad
 
 @enduml
