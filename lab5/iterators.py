@@ -26,18 +26,24 @@ class ClosestEnginesIterator(Iterator):
         return self
 
     def __next__(self) -> FireEngine:
-        if self._department_i < len(self._departments):
-            department = self._departments[self._department_i]
-            if self._engine_i < len(department.engines):
-                engine = department.engines[self._engine_i]
-                self._engine_i += 1
-                if engine.state == ReadyState():
-                    return engine
+        ready_engine = None
+
+        while not ready_engine:
+            if self._department_i < len(self._departments):
+                department = self._departments[self._department_i]
+
+                if self._engine_i < len(department.engines):
+                    engine = department.engines[self._engine_i]
+                    self._engine_i += 1
+                    if engine.state == ReadyState():
+                        ready_engine = engine
+                        break
                 else:
-                    return self.__next__()
+                    self._engine_i = 0
+                    self._department_i += 1
+                    continue
+
             else:
-                self._engine_i = 0
-                self._department_i += 1
-                return self.__next__()
-        else:
-            raise StopIteration
+                raise StopIteration
+
+        return ready_engine
