@@ -82,6 +82,9 @@ class FireEngine:
     def __repr__(self):
         return f"FireEngine('{self.name}', {self._state})"
 
+    def __str__(self):
+        return str(self.name)
+
 
 class FireEngineSquad:
     def __init__(self, engines: List[FireEngine], Strategy: Type['ExecutionStrategy']):

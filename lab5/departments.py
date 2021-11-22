@@ -3,7 +3,7 @@ from typing import List
 from lab5.events import Event, EventType
 from lab5.strategy import FirePreparationStrategy, LocalThreatPreparationStrategy, PreparationStrategy, \
     FAFirePreparationStrategy, FALocalThreatPreparationStrategy
-from lab5.fire_engines import FireEngine, FireEngineSquad
+from lab5.fire_engines import FireEngine, FireEngineSquad, ReadyState
 
 
 class Department:
@@ -30,6 +30,15 @@ class DepartmentManager:
     def departments(self):
         return self._departments
 
+    @property
+    def available_engines(self):
+        return len([
+            engine
+            for department in self.departments
+            for engine in department.engines
+            if engine.state == ReadyState()
+        ])
+
     def react_to_event(self, event: Event):
         match event.event_type:
             case EventType.FIRE:
@@ -41,6 +50,7 @@ class DepartmentManager:
             case EventType.LOCAL_THREAT_FALSE_ALARM:
                 self._strategy = FALocalThreatPreparationStrategy(self.departments)
 
+        print(f'available engines: {self.available_engines}')
         squad = self._strategy.request_squad(event)
         self._sender.add_squad(squad)
         self._sender.notify()

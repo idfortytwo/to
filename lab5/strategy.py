@@ -27,9 +27,15 @@ class PreparationStrategy(ABC):
         accepted_engines = 0
 
         while accepted_engines < n:
-            engine = next(engines_it)
-            engines.append(engine)
-            accepted_engines += 1
+            try:
+                engine = next(engines_it)
+                engines.append(engine)
+                accepted_engines += 1
+            except StopIteration:
+                time.sleep(1)
+                engines_it = iter(ClosestEnginesIterator(self._departments, event))
+                print(f'waiting for {n - accepted_engines} more')
+                continue
 
         return engines
 
@@ -91,8 +97,7 @@ class NormalExecutionStrategy(ExecutionStrategy):
     def _do_work(self):
         print('     […] ' + ', '.join(str(engine) for engine in self._squad))
 
-        # work_delay = 5 + random.random() * 20
-        work_delay = 5 + random.random() * 1
+        work_delay = 5 + random.random() * 20
         self._next_step(work_delay, self._depart_back)
 
     def _depart_back(self):
