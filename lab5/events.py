@@ -4,8 +4,9 @@ from typing import Tuple
 
 class EventType(Enum):
     FIRE = auto()
-    FALSE_ALARM = auto()
+    FIRE_FALSE_ALARM = auto()
     LOCAL_THREAT = auto()
+    LOCAL_THREAT_FALSE_ALARM = auto()
 
 
 class Event:

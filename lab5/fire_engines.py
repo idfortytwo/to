@@ -84,7 +84,7 @@ class FireEngine:
 
 
 class FireEngineSquad:
-    def __init__(self, engines: List[FireEngine], Strategy: Type[ExecutionStrategy]):
+    def __init__(self, engines: List[FireEngine], Strategy: Type['ExecutionStrategy']):
         self._engines = engines
         self._strategy = Strategy(self)
 

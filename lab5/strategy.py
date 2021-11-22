@@ -40,18 +40,32 @@ class PreparationStrategy(ABC):
 class FirePreparationStrategy(PreparationStrategy):
     def request_squad(self, event: Event):
         engines = self._request_n_engines(event, 3)
-        squad = FireEngineSquad(engines, ExecutionStrategy)
+        squad = FireEngineSquad(engines, NormalExecutionStrategy)
         return squad
 
 
 class LocalThreatPreparationStrategy(PreparationStrategy):
     def request_squad(self, event: Event):
         engines = self._request_n_engines(event, 2)
-        squad = FireEngineSquad(engines, ExecutionStrategy)
+        squad = FireEngineSquad(engines, NormalExecutionStrategy)
         return squad
 
 
-class ExecutionStrategy:
+class FAFirePreparationStrategy(PreparationStrategy):
+    def request_squad(self, event: Event):
+        engines = self._request_n_engines(event, 3)
+        squad = FireEngineSquad(engines, FalseAlarmExecutionStrategy)
+        return squad
+
+
+class FALocalThreatPreparationStrategy(PreparationStrategy):
+    def request_squad(self, event: Event):
+        engines = self._request_n_engines(event, 2)
+        squad = FireEngineSquad(engines, FalseAlarmExecutionStrategy)
+        return squad
+
+
+class ExecutionStrategy(ABC):
     def __init__(self, squad: FireEngineSquad):
         self._squad = squad
 
@@ -60,22 +74,53 @@ class ExecutionStrategy:
         thread = Thread(target=lambda: (time.sleep(delay), func()))
         thread.start()
 
+    @abstractmethod
+    def send(self):
+        pass
+
+
+class NormalExecutionStrategy(ExecutionStrategy):
     def _depart(self):
-        print('| ->  ' + ', '.join(str(engine) for engine in self._squad))
+        print('D -> [X] ' + ', '.join(str(engine) for engine in self._squad))
         for engine in self._squad:
             engine.set_state(BusyState())
 
         travel_delay = random.random() * 3
-        self._next_step(travel_delay, self._depart_back)
+        self._next_step(travel_delay, self._do_work)
+
+    def _do_work(self):
+        print('     […] ' + ', '.join(str(engine) for engine in self._squad))
+
+        # work_delay = 5 + random.random() * 20
+        work_delay = 5 + random.random() * 1
+        self._next_step(work_delay, self._depart_back)
 
     def _depart_back(self):
-        print('-> [] ' + ', '.join(str(engine) for engine in self._squad))
+        print('  <- [ ] ' + ', '.join(str(engine) for engine in self._squad))
 
         travel_delay = random.random() * 3
         self._next_step(travel_delay, self._return)
 
     def _return(self):
-        print('| <-  ' + ', '.join(str(engine) for engine in self._squad))
+        print('D <- [ ] ' + ', '.join(str(engine) for engine in self._squad))
+        for engine in self._squad:
+            engine.set_state(ReadyState())
+
+    def send(self):
+        self._depart()
+
+
+class FalseAlarmExecutionStrategy(ExecutionStrategy):
+    def _depart(self):
+        print('D ->  _  ' + ', '.join(str(engine) for engine in self._squad))
+        for engine in self._squad:
+            engine.set_state(BusyState())
+
+        travel_delay = random.random() * 3
+        self._next_step(travel_delay, self._return)
+
+    def _return(self):
+        print('D <-  _  ' + ', '.join(str(engine) for engine in self._squad))
         for engine in self._squad:
             engine.set_state(ReadyState())
 

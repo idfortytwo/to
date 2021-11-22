@@ -1,7 +1,8 @@
 from typing import List
 
 from lab5.events import Event, EventType
-from lab5.strategy import FirePreparationStrategy, LocalThreatPreparationStrategy, PreparationStrategy
+from lab5.strategy import FirePreparationStrategy, LocalThreatPreparationStrategy, PreparationStrategy, \
+    FAFirePreparationStrategy, FALocalThreatPreparationStrategy
 from lab5.fire_engines import FireEngine, FireEngineSquad
 
 
@@ -35,6 +36,10 @@ class DepartmentManager:
                 self._strategy = FirePreparationStrategy(self.departments)
             case EventType.LOCAL_THREAT:
                 self._strategy = LocalThreatPreparationStrategy(self.departments)
+            case EventType.FIRE_FALSE_ALARM:
+                self._strategy = FAFirePreparationStrategy(self.departments)
+            case EventType.LOCAL_THREAT_FALSE_ALARM:
+                self._strategy = FALocalThreatPreparationStrategy(self.departments)
 
         squad = self._strategy.request_squad(event)
         self._sender.add_squad(squad)
