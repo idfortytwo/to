@@ -32,13 +32,14 @@ class FireEngineSquad {
     + __iter__(): List[FireEngine]
 }
 FireEngineSquad "1" --o "n" FireEngine
-FireEngineSquad "1" o--* "1" ExecutionStrategy
+FireEngineSquad "1" o-d-* "1" ExecutionStrategy
 
 
 enum EventType {
     + {static} FIRE
-    + {static} FALSE_ALARM
+    + {static} FIRE_FALSE_ALARM
     + {static} LOCAL_THREAT
+    + {static} LOCAL_THREAT_FALSE_ALARM
 }
 class Event {
     + event_type: EventType
@@ -52,14 +53,12 @@ class Department {
 }
 abstract class Iterator {
     + {abstract} __iter__()
-    + {abstract} __next__()
 }
 class ClosestEnginesIterator {
     - _departments: List[Department]
     - _department_i: int
     - _engine_i: int
     + __iter__(): ClosestEnginesIterator
-    + __next__(): FireEngine
 }
 ClosestEnginesIterator --r|> Iterator
 ClosestEnginesIterator -- Event
@@ -80,17 +79,37 @@ class FirePreparationStrategy {
 class LocalThreatPreparationStrategy {
     + request_squad(Event): FireEngineSquad
 }
+class FAFirePreparationStrategy {
+    + request_squad(Event): FireEngineSquad
+}
+class FALocalThreatPreparationStrategy {
+    + request_squad(Event): FireEngineSquad
+}
 FirePreparationStrategy .d-|> PreparationStrategy
 LocalThreatPreparationStrategy .d-|> PreparationStrategy
+FAFirePreparationStrategy .d-|> PreparationStrategy
+FALocalThreatPreparationStrategy .d-|> PreparationStrategy
 
 class ExecutionStrategy {
     - _squad: FireEngineSquad
-    + send()
+    + {abstract} send()
     - {static} _next_step(delay: float, Callable)
+}
+class NormalExecutionStrategy {
+    + send()
+    - _depart()
+    - _do_work()
+    - _depart_back()
+    - _return()
+}
+class FalseAlarmExecutionStrategy {
+    + send()
     - _depart()
     - _depart_back()
     - _return()
 }
+NormalExecutionStrategy .u-|> ExecutionStrategy
+FalseAlarmExecutionStrategy .u-|> ExecutionStrategy
 
 
 class DepartmentsManager {
