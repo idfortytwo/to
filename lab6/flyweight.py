@@ -19,12 +19,6 @@ class FlyweightFactory:
         last_node = self._get_last_node(name)
         last_node.coords = coords
 
-        # leaf = Node(str(coords))
-        # if last_node.next_nodes:
-        #     last_node.next_nodes[0] = leaf
-        # else:
-        #     last_node.next_nodes.append(leaf)
-
     def get(self, name: str) -> Tuple[int, int]:
         last_node = self._get_last_node(name)
         return last_node.coords
@@ -56,7 +50,7 @@ class FlyweightFactory:
         return json.dumps(self._tree_root, cls=AllFieldsEncoder)
 
     @classmethod
-    def from_json(cls, json_string: str):
+    def _from_json(cls, json_string: str):
         json_ = json.loads(json_string)
         return cls(data=Node.from_json(json_))
 
@@ -65,7 +59,7 @@ class FlyweightFactory:
         with open(filename, 'r') as file:
             data = ''.join(file.readlines())
             print(data)
-            return cls.from_json(data)
+            return cls._from_json(data)
 
     def save(self, filename: str):
         with open(filename, 'w') as file:
