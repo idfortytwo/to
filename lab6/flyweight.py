@@ -1,5 +1,3 @@
-# from __future__ import annotations
-
 import json
 
 from typing import Tuple, List
@@ -58,7 +56,6 @@ class FlyweightFactory:
     def from_file(cls, filename: str):
         with open(filename, 'r') as file:
             data = ''.join(file.readlines())
-            print(data)
             return cls._from_json(data)
 
     def save(self, filename: str):
