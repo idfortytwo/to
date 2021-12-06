@@ -1,0 +1,50 @@
+@startuml
+
+class Node {
+    + value: str
+    + coords: Tuple[int, int]
+    + next_nodes: List[Node]
+
+    + {static} from_json(Dict): Node
+    + {static} from_json_str(str): Node
+    + {static} from_values(List[str]): Node
+    + {static} from_str(str): Node
+}
+
+class FlyweightFactory {
+    + {r/o} data: Node
+
+    + add(str, Tuple[int, int])
+    + get(str): Tuple[int, int]
+    + to_json(): str
+    + save(str)
+    + {static} from_file(str)
+    - _get_last_node(str: Node)
+    - {static} _index_of(List[Node], Node): int
+    - {static} _from_json(str)
+}
+
+class JSONEncoder
+class AllFieldsEncoder {
+    + default(object): object.__dict__
+}
+
+class MigrantRepository {
+    - _flyweights: FlyweightFactory
+    + {r/o} data: Node
+
+    + add(str, Tuple[int, int])
+    + get(str): Tuple[int, int]
+    + to_json(): str
+    + save(str)
+    + {static} from_file(str)
+}
+
+Node "1" --lo "0..N" Node
+FlyweightFactory --u> AllFieldsEncoder
+AllFieldsEncoder -r|> JSONEncoder
+FlyweightFactory "1" -r* "1" Node
+MigrantRepository "1" --u* "1" FlyweightFactory
+
+Main --l* MigrantRepository
+@enduml
