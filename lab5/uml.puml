@@ -35,7 +35,7 @@ class FireEngineSquad {
     + __iter__(): List[FireEngine]
 }
 FireEngineSquad "1" --o "n" FireEngine
-FireEngineSquad "1" o-d-* "1" ExecutionStrategy
+FireEngineSquad "1" *-d-* "1" ExecutionStrategy
 
 
 enum EventType {
