@@ -43,8 +43,8 @@ class MigrantRepository {
 Node "1" --lo "0..N" Node
 FlyweightFactory --u> AllFieldsEncoder
 AllFieldsEncoder -r|> JSONEncoder
-FlyweightFactory "1" -r* "1" Node
-MigrantRepository "1" --u* "1" FlyweightFactory
+FlyweightFactory "1" *-r- "1" Node
+MigrantRepository "1" *-u- "1" FlyweightFactory
 
-Main --l* MigrantRepository
+Main *-l- MigrantRepository
 @enduml
